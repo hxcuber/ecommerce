@@ -3,8 +3,8 @@ CREATE TYPE CATEGORY AS ENUM ('default', 'interesting', 'testing');
 
 CREATE TABLE IF NOT EXISTS users (
   user_id UUID PRIMARY KEY,
-  username TEXT NOT NULL,
-  email TEXT NOT NULL,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   created_at TIMESTAMP
 );

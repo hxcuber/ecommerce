@@ -51,32 +51,90 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	return str
 }
 
+type Status string
+
 // Enum values for Status
 const (
-	StatusRBlockedS    string = "r_blocked_s"
-	StatusRSubscribedS string = "r_subscribed_s"
-	StatusFriends      string = "friends"
+	StatusProcessed Status = "processed"
+	StatusShipped   Status = "shipped"
+	StatusDelivered Status = "delivered"
 )
 
-func AllStatus() []string {
-	return []string{
-		StatusRBlockedS,
-		StatusRSubscribedS,
-		StatusFriends,
+func AllStatus() []Status {
+	return []Status{
+		StatusProcessed,
+		StatusShipped,
+		StatusDelivered,
 	}
 }
 
+func (e Status) IsValid() error {
+	switch e {
+	case StatusProcessed, StatusShipped, StatusDelivered:
+		return nil
+	default:
+		return errors.New("enum is not valid")
+	}
+}
+
+func (e Status) String() string {
+	return string(e)
+}
+
+func (e Status) Ordinal() int {
+	switch e {
+	case StatusProcessed:
+		return 0
+	case StatusShipped:
+		return 1
+	case StatusDelivered:
+		return 2
+
+	default:
+		panic(errors.New("enum is not valid"))
+	}
+}
+
+type Category string
+
 // Enum values for Category
 const (
-	CategoryDefault     string = "default"
-	CategoryInteresting string = "interesting"
-	CategoryTesting     string = "testing"
+	CategoryDefault     Category = "default"
+	CategoryInteresting Category = "interesting"
+	CategoryTesting     Category = "testing"
 )
 
-func AllCategory() []string {
-	return []string{
+func AllCategory() []Category {
+	return []Category{
 		CategoryDefault,
 		CategoryInteresting,
 		CategoryTesting,
+	}
+}
+
+func (e Category) IsValid() error {
+	switch e {
+	case CategoryDefault, CategoryInteresting, CategoryTesting:
+		return nil
+	default:
+		return errors.New("enum is not valid")
+	}
+}
+
+func (e Category) String() string {
+	return string(e)
+}
+
+func (e Category) Ordinal() int {
+	switch e {
+	case CategoryDefault:
+		return 0
+	case CategoryInteresting:
+		return 1
+	case CategoryTesting:
+		return 2
+
+	default:
+		panic(errors.New("enum is not valid"))
 	}
 }

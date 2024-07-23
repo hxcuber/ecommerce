@@ -29,7 +29,7 @@ type Product struct {
 	Description string    `boil:"description" json:"description" toml:"description" yaml:"description"`
 	Price       float32   `boil:"price" json:"price" toml:"price" yaml:"price"`
 	Stock       int64     `boil:"stock" json:"stock" toml:"stock" yaml:"stock"`
-	CategoryID  string    `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
+	CategoryID  Category  `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
 	CreatedAt   null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt   null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
@@ -108,13 +108,48 @@ func (w whereHelperfloat32) NIN(slice []float32) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
+type whereHelperCategory struct{ field string }
+
+func (w whereHelperCategory) EQ(x Category) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelperCategory) NEQ(x Category) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelperCategory) LT(x Category) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelperCategory) LTE(x Category) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelperCategory) GT(x Category) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelperCategory) GTE(x Category) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelperCategory) IN(slice []Category) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperCategory) NIN(slice []Category) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
 var ProductWhere = struct {
 	ProductID   whereHelperstring
 	Name        whereHelperstring
 	Description whereHelperstring
 	Price       whereHelperfloat32
 	Stock       whereHelperint64
-	CategoryID  whereHelperstring
+	CategoryID  whereHelperCategory
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 }{
@@ -123,7 +158,7 @@ var ProductWhere = struct {
 	Description: whereHelperstring{field: "\"products\".\"description\""},
 	Price:       whereHelperfloat32{field: "\"products\".\"price\""},
 	Stock:       whereHelperint64{field: "\"products\".\"stock\""},
-	CategoryID:  whereHelperstring{field: "\"products\".\"category_id\""},
+	CategoryID:  whereHelperCategory{field: "\"products\".\"category_id\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"products\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"products\".\"updated_at\""},
 }

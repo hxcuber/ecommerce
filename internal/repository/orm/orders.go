@@ -28,7 +28,7 @@ type Order struct {
 	UserID          string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	TotalAmount     int64     `boil:"total_amount" json:"total_amount" toml:"total_amount" yaml:"total_amount"`
 	ShippingAddress string    `boil:"shipping_address" json:"shipping_address" toml:"shipping_address" yaml:"shipping_address"`
-	Status          string    `boil:"status" json:"status" toml:"status" yaml:"status"`
+	Status          Status    `boil:"status" json:"status" toml:"status" yaml:"status"`
 	CreatedAt       null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt       null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
@@ -97,6 +97,29 @@ func (w whereHelperint64) NIN(slice []int64) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
+type whereHelperStatus struct{ field string }
+
+func (w whereHelperStatus) EQ(x Status) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperStatus) NEQ(x Status) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperStatus) LT(x Status) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperStatus) LTE(x Status) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperStatus) GT(x Status) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperStatus) GTE(x Status) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperStatus) IN(slice []Status) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperStatus) NIN(slice []Status) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
 type whereHelpernull_Time struct{ field string }
 
 func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
@@ -126,7 +149,7 @@ var OrderWhere = struct {
 	UserID          whereHelperstring
 	TotalAmount     whereHelperint64
 	ShippingAddress whereHelperstring
-	Status          whereHelperstring
+	Status          whereHelperStatus
 	CreatedAt       whereHelpernull_Time
 	UpdatedAt       whereHelpernull_Time
 }{
@@ -134,7 +157,7 @@ var OrderWhere = struct {
 	UserID:          whereHelperstring{field: "\"orders\".\"user_id\""},
 	TotalAmount:     whereHelperint64{field: "\"orders\".\"total_amount\""},
 	ShippingAddress: whereHelperstring{field: "\"orders\".\"shipping_address\""},
-	Status:          whereHelperstring{field: "\"orders\".\"status\""},
+	Status:          whereHelperStatus{field: "\"orders\".\"status\""},
 	CreatedAt:       whereHelpernull_Time{field: "\"orders\".\"created_at\""},
 	UpdatedAt:       whereHelpernull_Time{field: "\"orders\".\"updated_at\""},
 }
