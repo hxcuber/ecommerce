@@ -1,0 +1,501 @@
+openapi: 3.0.0
+info:
+  title: E-Commerce API
+  version: 1.0.0
+  description: API for an e-commerce platform with complex business logic
+servers:
+  - url: http://localhost:3000
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: API-Key
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+security:
+  - ApiKeyAuth: []
+  - OAuth2:
+      - read
+      - write
+paths:
+  /users/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+      description: |
+        - Validate that the email and username are unique.
+        - Hash the password before storing it.
+  /users/login:
+    post:
+      summary: Authenticate a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  expires_in:
+                    type: integer
+      description: |
+        - Verify that the email and password match.
+        - Generate an access token upon successful authentication.
+        - Implement rate limiting to prevent brute-force attacks.
+  /users/{user_id}:
+    get:
+      summary: Get user details
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Ensure that only authenticated users can access this endpoint.
+        - The authenticated user can only fetch their own details unless they have admin privileges.
+      security:
+        - OAuth2:
+            - read
+  /products:
+    post:
+      summary: Add a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: integer
+                category_id:
+                  type: string
+              required:
+                - name
+                - price
+                - stock
+                - category_id
+      responses:
+        '200':
+          description: Product added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: integer
+                  category_id:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Validate that the category exists.
+        - Ensure that only authenticated users with admin privileges can add products.
+      security:
+        - OAuth2:
+            - write
+  /products/{product_id}:
+    get:
+      summary: Get product details
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product details retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: integer
+                  category_id:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Apply business rules to check if the product is available for viewing based on its status (e.g., active, discontinued).
+    put:
+      summary: Update product details
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: integer
+                category_id:
+                  type: string
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: integer
+                  category_id:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Ensure that only authenticated users with admin privileges can update products.
+        - Validate that the category exists.
+        - Check for potential conflicts, such as updating the stock of a product that is part of a pending order.
+      security:
+        - OAuth2:
+            - write
+  /orders:
+    post:
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: string
+                      quantity:
+                        type: integer
+                  required:
+                    - product_id
+                    - quantity
+                total_amount:
+                  type: number
+                shipping_address:
+                  type: string
+              required:
+                - user_id
+                - items
+                - total_amount
+                - shipping_address
+      responses:
+        '200':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                  user_id:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: string
+                        quantity:
+                          type: integer
+                        price:
+                          type: number
+                  total_amount:
+                    type: number
+                  shipping_address:
+                    type: string
+                  status:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Calculate the total amount based on the product prices and quantities.
+        - Apply any discounts or taxes based on business rules.
+        - Decrease the stock levels of the ordered products.
+        - Validate that the user has sufficient balance or credit.
+        - Ensure the shipping address is valid.
+        - Trigger inventory update and notification processes.
+      security:
+        - OAuth2:
+            - write
+  /orders/{order_id}:
+    get:
+      summary: Get order details
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                  user_id:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: string
+                        quantity:
+                          type: integer
+                        price:
+                          type: number
+                  total_amount:
+                    type: number
+                  shipping_address:
+                    type: string
+                  status:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Ensure that only the user who placed the order or an admin can view the order details.
+        - Validate the status of the order and retrieve the relevant information.
+      security:
+        - OAuth2:
+            - read
+  /orders/{order_id}/status:
+    put:
+      summary: Update order status
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Order status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                  status:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Ensure that only authenticated users with appropriate permissions can update order status.
+        - Validate the status transition (e.g., an order cannot go from "Delivered" back to "Processing").
+        - Trigger notifications to the user and update related systems (e.g., inventory management, shipping).
+      security:
+        - OAuth2:
+            - write
+  /inventory/{product_id}:
+    put:
+      summary: Update stock level
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stock:
+                  type: integer
+      responses:
+        '200':
+          description: Stock level updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                  stock:
+                    type: integer
+                  updated_at:
+                    type: string
+                    format: date-time
+      description: |
+        - Ensure that only authenticated users with admin privileges can update stock levels.
+        - Check for any pending orders that might be affected by the stock update.
+        - Trigger notifications or alerts if the stock level falls below a certain threshold.
+      security:
+        - OAuth2:
+            - write
+    get:
+      summary: Get stock level
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stock level retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                  stock:
+                    type: integer
+      description: |
+        - Apply any business rules related to stock visibility (e.g., hide stock levels for discontinued products).
+      security:
+        - OAuth2:
+            - read
