@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -24,9 +23,9 @@ import (
 
 // OrderItem is an object representing the database table.
 type OrderItem struct {
-	OrderID   string     `boil:"order_id" json:"order_id" toml:"order_id" yaml:"order_id"`
-	ProductID string     `boil:"product_id" json:"product_id" toml:"product_id" yaml:"product_id"`
-	Quantity  null.Int64 `boil:"quantity" json:"quantity,omitempty" toml:"quantity" yaml:"quantity,omitempty"`
+	OrderID   string `boil:"order_id" json:"order_id" toml:"order_id" yaml:"order_id"`
+	ProductID string `boil:"product_id" json:"product_id" toml:"product_id" yaml:"product_id"`
+	Quantity  int64  `boil:"quantity" json:"quantity" toml:"quantity" yaml:"quantity"`
 
 	R *orderItemR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L orderItemL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -81,34 +80,22 @@ func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
-type whereHelpernull_Int64 struct{ field string }
+type whereHelperint64 struct{ field string }
 
-func (w whereHelpernull_Int64) EQ(x null.Int64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Int64) NEQ(x null.Int64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Int64) LT(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Int64) LTE(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Int64) GT(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Int64) GTE(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_Int64) IN(slice []int64) qm.QueryMod {
+func (w whereHelperint64) EQ(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint64) NEQ(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint64) LT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint64) LTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint64) GT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint64) GTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint64) IN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
 	}
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelpernull_Int64) NIN(slice []int64) qm.QueryMod {
+func (w whereHelperint64) NIN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
@@ -116,17 +103,14 @@ func (w whereHelpernull_Int64) NIN(slice []int64) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
-func (w whereHelpernull_Int64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var OrderItemWhere = struct {
 	OrderID   whereHelperstring
 	ProductID whereHelperstring
-	Quantity  whereHelpernull_Int64
+	Quantity  whereHelperint64
 }{
 	OrderID:   whereHelperstring{field: "\"order_items\".\"order_id\""},
 	ProductID: whereHelperstring{field: "\"order_items\".\"product_id\""},
-	Quantity:  whereHelpernull_Int64{field: "\"order_items\".\"quantity\""},
+	Quantity:  whereHelperint64{field: "\"order_items\".\"quantity\""},
 }
 
 // OrderItemRels is where relationship names are stored.
@@ -168,8 +152,8 @@ type orderItemL struct{}
 
 var (
 	orderItemAllColumns            = []string{"order_id", "product_id", "quantity"}
-	orderItemColumnsWithoutDefault = []string{"order_id", "product_id"}
-	orderItemColumnsWithDefault    = []string{"quantity"}
+	orderItemColumnsWithoutDefault = []string{"order_id", "product_id", "quantity"}
+	orderItemColumnsWithDefault    = []string{}
 	orderItemPrimaryKeyColumns     = []string{"order_id", "product_id"}
 	orderItemGeneratedColumns      = []string{}
 )

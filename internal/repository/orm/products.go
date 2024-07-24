@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -30,8 +29,8 @@ type Product struct {
 	Price       float32   `boil:"price" json:"price" toml:"price" yaml:"price"`
 	Stock       int64     `boil:"stock" json:"stock" toml:"stock" yaml:"stock"`
 	CategoryID  Category  `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
-	CreatedAt   null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt   null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt   time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *productR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L productL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -150,8 +149,8 @@ var ProductWhere = struct {
 	Price       whereHelperfloat32
 	Stock       whereHelperint64
 	CategoryID  whereHelperCategory
-	CreatedAt   whereHelpernull_Time
-	UpdatedAt   whereHelpernull_Time
+	CreatedAt   whereHelpertime_Time
+	UpdatedAt   whereHelpertime_Time
 }{
 	ProductID:   whereHelperstring{field: "\"products\".\"product_id\""},
 	Name:        whereHelperstring{field: "\"products\".\"name\""},
@@ -159,8 +158,8 @@ var ProductWhere = struct {
 	Price:       whereHelperfloat32{field: "\"products\".\"price\""},
 	Stock:       whereHelperint64{field: "\"products\".\"stock\""},
 	CategoryID:  whereHelperCategory{field: "\"products\".\"category_id\""},
-	CreatedAt:   whereHelpernull_Time{field: "\"products\".\"created_at\""},
-	UpdatedAt:   whereHelpernull_Time{field: "\"products\".\"updated_at\""},
+	CreatedAt:   whereHelpertime_Time{field: "\"products\".\"created_at\""},
+	UpdatedAt:   whereHelpertime_Time{field: "\"products\".\"updated_at\""},
 }
 
 // ProductRels is where relationship names are stored.
@@ -192,8 +191,8 @@ type productL struct{}
 
 var (
 	productAllColumns            = []string{"product_id", "name", "description", "price", "stock", "category_id", "created_at", "updated_at"}
-	productColumnsWithoutDefault = []string{"product_id", "name", "description", "price", "stock", "category_id"}
-	productColumnsWithDefault    = []string{"created_at", "updated_at"}
+	productColumnsWithoutDefault = []string{"product_id", "name", "description", "price", "stock", "category_id", "created_at", "updated_at"}
+	productColumnsWithDefault    = []string{}
 	productPrimaryKeyColumns     = []string{"product_id"}
 	productGeneratedColumns      = []string{}
 )
@@ -735,11 +734,11 @@ func (o *Product) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		if queries.MustTime(o.UpdatedAt).IsZero() {
-			queries.SetScanner(&o.UpdatedAt, currTime)
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
 		}
 	}
 
@@ -820,7 +819,7 @@ func (o *Product) Update(ctx context.Context, exec boil.ContextExecutor, columns
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	var err error
@@ -956,10 +955,10 @@ func (o *Product) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
-		queries.SetScanner(&o.UpdatedAt, currTime)
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

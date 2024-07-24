@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -28,7 +27,7 @@ type User struct {
 	Username     string    `boil:"username" json:"username" toml:"username" yaml:"username"`
 	Email        string    `boil:"email" json:"email" toml:"email" yaml:"email"`
 	PasswordHash string    `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
-	CreatedAt    null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	CreatedAt    time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -69,13 +68,13 @@ var UserWhere = struct {
 	Username     whereHelperstring
 	Email        whereHelperstring
 	PasswordHash whereHelperstring
-	CreatedAt    whereHelpernull_Time
+	CreatedAt    whereHelpertime_Time
 }{
 	UserID:       whereHelperstring{field: "\"users\".\"user_id\""},
 	Username:     whereHelperstring{field: "\"users\".\"username\""},
 	Email:        whereHelperstring{field: "\"users\".\"email\""},
 	PasswordHash: whereHelperstring{field: "\"users\".\"password_hash\""},
-	CreatedAt:    whereHelpernull_Time{field: "\"users\".\"created_at\""},
+	CreatedAt:    whereHelpertime_Time{field: "\"users\".\"created_at\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -107,8 +106,8 @@ type userL struct{}
 
 var (
 	userAllColumns            = []string{"user_id", "username", "email", "password_hash", "created_at"}
-	userColumnsWithoutDefault = []string{"user_id", "username", "email", "password_hash"}
-	userColumnsWithDefault    = []string{"created_at"}
+	userColumnsWithoutDefault = []string{"user_id", "username", "email", "password_hash", "created_at"}
+	userColumnsWithDefault    = []string{}
 	userPrimaryKeyColumns     = []string{"user_id"}
 	userGeneratedColumns      = []string{}
 )
@@ -650,8 +649,8 @@ func (o *User) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
 	}
 
@@ -862,8 +861,8 @@ func (o *User) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
 
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
 		}
 	}
 
