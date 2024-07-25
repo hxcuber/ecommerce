@@ -6,10 +6,8 @@ import (
 	userCtrl "github.com/hxcuber/ecommerce/internal/controller/user"
 	"github.com/hxcuber/ecommerce/internal/handler/user/request"
 	"github.com/hxcuber/ecommerce/internal/handler/user/response"
-	"github.com/hxcuber/ecommerce/pkg/model"
 	"github.com/hxcuber/ecommerce/pkg/util"
 	"net/http"
-	"time"
 )
 
 func (h Handler) PostUsersRegister() http.HandlerFunc {
@@ -19,11 +17,7 @@ func (h Handler) PostUsersRegister() http.HandlerFunc {
 			return util.ErrorDesc{Description: err.Error()}, http.StatusBadRequest
 		}
 
-		user, err := h.ctrl.RegisterUser(r.Context(), model.User{
-			Username:  req.Username,
-			Email:     req.Email,
-			CreatedAt: time.Time{},
-		}, req.Password)
+		user, err := h.ctrl.RegisterUser(r.Context(), req)
 		if errors.Is(err, userCtrl.ErrEmailInUse) || errors.Is(err, userCtrl.ErrUsernameInUse) {
 			return util.ErrorDesc{Description: err.Error()}, http.StatusBadRequest
 		}
@@ -32,7 +26,7 @@ func (h Handler) PostUsersRegister() http.HandlerFunc {
 		}
 
 		return response.UserDetailsResponse{
-			UserID:    user.UserID.String(),
+			UserID:    string(user.UserID),
 			Username:  user.Username,
 			Email:     user.Email,
 			CreatedAt: user.CreatedAt,

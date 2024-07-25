@@ -2,14 +2,15 @@ package user
 
 import (
 	"context"
-	"github.com/google/uuid"
+	"github.com/hxcuber/ecommerce/internal/handler/user/request"
 	"github.com/hxcuber/ecommerce/internal/repository"
 	"github.com/hxcuber/ecommerce/pkg/model"
+	"github.com/hxcuber/ecommerce/pkg/util"
 )
 
 type Controller interface {
-	GetUserDetails(ctx context.Context, id uuid.UUID) (model.User, error)
-	RegisterUser(ctx context.Context, user model.User, password string) (model.User, error)
+	GetUserDetails(ctx context.Context, id util.UUIDString) (model.User, error)
+	RegisterUser(ctx context.Context, request request.RegisterUserRequest) (model.User, error)
 }
 
 type impl struct {

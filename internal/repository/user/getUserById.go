@@ -2,16 +2,15 @@ package user
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"github.com/hxcuber/ecommerce/internal/repository/orm"
-	"github.com/hxcuber/ecommerce/pkg/model"
+	"github.com/hxcuber/ecommerce/pkg/util"
 )
 
-func (i impl) GetUserById(ctx context.Context, id uuid.UUID) (model.User, error) {
-	ormUser, err := orm.FindUser(ctx, i.dbConn, id.String())
+func (i impl) GetUserById(ctx context.Context, id util.UUIDString) (*orm.User, error) {
+	ormUser, err := orm.FindUser(ctx, i.dbConn, string(id))
 	if err != nil {
-		return model.User{}, err
+		return nil, err
 	}
 
-	return model.FromOrmUser(ormUser)
+	return ormUser, nil
 }
