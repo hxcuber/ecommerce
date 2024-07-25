@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  created_at TIMESTAMP
+  created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS products (
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS products (
   price REAL NOT NULL,
   stock BIGINT NOT NULL,
   category_id CATEGORY NOT NULL,
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -26,15 +26,15 @@ CREATE TABLE IF NOT EXISTS orders (
   total_amount BIGINT NOT NULL,
   shipping_address TEXT NOT NULL,
   status STATUS NOT NULL,
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP,
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP NOT NULL,
   FOREIGN KEY ( user_id ) REFERENCES users ( user_id )
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
   order_id UUID,
   product_id UUID,
-  quantity BIGINT,
+  quantity BIGINT NOT NULL,
   PRIMARY KEY (order_id, product_id),
   FOREIGN KEY (order_id) references orders (order_id),
   FOREIGN KEY (product_id) references products (product_id)

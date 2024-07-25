@@ -1,0 +1,50 @@
+services:
+  pg:
+    container_name: $PROJECT_NAME-db
+    image: postgres:16-alpine
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    environment:
+      TZ: UTC
+      POSTGRES_USER: $PROJECT_NAME
+      POSTGRES_HOST_AUTH_METHOD: trust
+  db-migrate:
+    container_name: $PROJECT_NAME-migrate
+    image: $PROJECT_NAME-migrate:latest
+    command:
+      [
+        "-path", "/migrations",
+       "-database", "postgres://$PROJECT_NAME@pg:5432/$PROJECT_NAME?sslmode=disable",
+       "up"
+      ]
+    depends_on:
+      - pg
+  api:
+    container_name: $PROJECT_NAME-api
+    image: $PROJECT_NAME-api:latest
+    environment:
+      TZ: UTC
+      DATABASE_URL: postgres://$PROJECT_NAME@pg:5432/$PROJECT_NAME?sslmode=disable
+      DB_POOL_MAX_OPEN_CONNS: '4'
+      DB_POOL_MAX_IDLE_CONNS: '2'
+      DB_DEBUG_LOGGING_ENABLED: 'true'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db-migrate
+#  test:
+#    container_name: $PROJECT_NAME-test
+#    image: $PROJECT_NAME-api:latest
+##    environment:
+##      TZ: UTC
+##      DATABASE_URL: postgres://$PROJECT_NAME@pg:5432/$PROJECT_NAME?sslmode=disable
+##      DB_POOL_MAX_OPEN_CONNS: '4'
+##      DB_POOL_MAX_IDLE_CONNS: '2'
+##      DB_DEBUG_LOGGING_ENABLED: 'true'
+##    depends_on:
+##      - db-migrate
+#    command: ["sh", "-c", "go test ./..."]
