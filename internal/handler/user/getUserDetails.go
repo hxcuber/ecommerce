@@ -18,7 +18,7 @@ func (h Handler) GetUserDetails() http.HandlerFunc {
 
 		id, err := uuid.Parse(idString)
 		if err != nil {
-			return util.ErrorDesc{Description: "unable to parse id"}, http.StatusInternalServerError
+			return util.ErrorDesc{Description: "unable to parse id"}, http.StatusBadRequest
 		}
 
 		user, err := h.ctrl.GetUserDetails(r.Context(), id)

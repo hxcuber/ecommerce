@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/hxcuber/ecommerce/internal/repository"
 	"github.com/hxcuber/ecommerce/pkg/logerr"
 	"github.com/hxcuber/ecommerce/pkg/model"
@@ -28,6 +29,9 @@ func (i impl) RegisterUser(ctx context.Context, user model.User, password string
 		log.Printf(logerr.LogErrMessage("RegisterUser", "hashing password", err))
 	}
 	user.PasswordHash = string(passwordHash)
+
+	// Create new UUID for user
+	user.UserID = uuid.New()
 
 	// Create user in db with transaction
 	var returnUser model.User

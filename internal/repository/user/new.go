@@ -18,7 +18,7 @@ type impl struct {
 	dbConn pg.ContextExecutor
 }
 
-func New(dbConn pg.ContextExecutor) Repository {
+func NewRepo(dbConn pg.ContextExecutor) Repository {
 	return impl{
 		dbConn: dbConn,
 	}

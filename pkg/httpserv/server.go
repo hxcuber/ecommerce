@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/friendsofgo/errors"
+	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -41,7 +41,7 @@ func (s *server) Start(ctx context.Context) error {
 		startupError <- s.srv.ListenAndServe()
 	}()
 
-	fmt.Fprintf(os.Stdout, "Running: http://localhost%s/\n", s.srv.Addr)
+	log.Printf("Running: http://localhost%s/\n", s.srv.Addr)
 
 	// Blocking main and waiting for shutdown.
 	select {

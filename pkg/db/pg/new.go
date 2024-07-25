@@ -17,7 +17,6 @@ func NewPool(
 	poolMaxOpenConns,
 	poolMaxIdleConns int,
 ) (BeginnerExecutor, error) {
-	fmt.Println("url: ", url)
 	log.Println("Initializing Postgres")
 
 	conn, err := sql.Open("postgres", url)

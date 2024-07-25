@@ -23,7 +23,8 @@ type impl struct {
 
 func New(dbConn pg.BeginnerExecutor) Registry {
 	return impl{
-		dbConn: dbConn,
+		dbConn:   dbConn,
+		userRepo: user.NewRepo(dbConn),
 	}
 }
 
@@ -43,7 +44,8 @@ func (i impl) DoInTx(ctx context.Context, txFunc func(ctx context.Context, txRep
 
 	return pg.TxWithBackOff(ctx, overrideBackoffPolicy, i.dbConn, func(tx pg.ContextExecutor) error {
 		newI := impl{
-			tx: tx,
+			tx:       tx,
+			userRepo: user.NewRepo(tx),
 		}
 		return txFunc(ctx, newI)
 	})
