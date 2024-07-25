@@ -3,7 +3,6 @@ package user
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/google/uuid"
 	"github.com/hxcuber/ecommerce/internal/handler/user/response"
 	"github.com/hxcuber/ecommerce/pkg/util"
 	"net/http"
@@ -11,23 +10,22 @@ import (
 
 func (h Handler) GetUsersUserId() http.HandlerFunc {
 	return util.ErrorHandler(func(w http.ResponseWriter, r *http.Request) (render.Renderer, int) {
-		idString := chi.URLParam(r, "user_id")
-		if idString == "" {
+		id := chi.URLParam(r, "user_id")
+		if id == "" {
 			return util.ErrorDesc{Description: "no id provided"}, http.StatusBadRequest
 		}
 
-		id, err := uuid.Parse(idString)
-		if err != nil {
+		if !util.ValidUUID(id) {
 			return util.ErrorDesc{Description: "unable to parse id"}, http.StatusBadRequest
 		}
 
-		user, err := h.ctrl.GetUserDetails(r.Context(), id)
+		user, err := h.ctrl.GetUserDetails(r.Context(), util.UUIDString(id))
 		if err != nil {
 			return util.ErrorDesc{Description: err.Error()}, http.StatusInternalServerError
 		}
 
 		return response.UserDetailsResponse{
-			UserID:    user.UserID.String(),
+			UserID:    string(user.UserID),
 			Username:  user.Username,
 			Email:     user.Email,
 			CreatedAt: user.CreatedAt,

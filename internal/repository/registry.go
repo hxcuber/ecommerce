@@ -10,6 +10,7 @@ import (
 	"github.com/hxcuber/ecommerce/internal/repository/user"
 	"github.com/hxcuber/ecommerce/pkg/db/pg"
 	"github.com/hxcuber/ecommerce/pkg/logerr"
+	"log"
 	"time"
 )
 
@@ -58,7 +59,7 @@ func (i impl) OrderItem() orderitem.Repository {
 
 func (i impl) DoInTx(ctx context.Context, txFunc func(ctx context.Context, txRepo Registry) error, overrideBackoffPolicy backoff.BackOff) error {
 	if i.tx != nil {
-		logerr.LogErrMessage("DoInTx", "doing in transaction", errNestedTx)
+		log.Printf(logerr.LogErrMessage("DoInTx", "doing in transaction", errNestedTx))
 		return errors.WithStack(errNestedTx)
 	}
 
