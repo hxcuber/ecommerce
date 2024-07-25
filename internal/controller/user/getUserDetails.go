@@ -2,17 +2,18 @@ package user
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"github.com/hxcuber/ecommerce/pkg/logerr"
 	"github.com/hxcuber/ecommerce/pkg/model"
+	"github.com/hxcuber/ecommerce/pkg/util"
+	"log"
 )
 
-func (i impl) GetUserDetails(ctx context.Context, id uuid.UUID) (model.User, error) {
+func (i impl) GetUserDetails(ctx context.Context, id util.UUIDString) (model.User, error) {
 	user, err := i.reg.User().GetUserById(context.Background(), id)
 	if err != nil {
-		logerr.LogErrMessage("GetUserDetails", "getting user by id", err)
+		log.Printf(logerr.LogErrMessage("GetUserDetails", "getting user by id", err))
 		return model.User{}, err
 	}
 
-	return user, nil
+	return model.FromOrmUser(user), nil
 }
