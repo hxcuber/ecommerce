@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func (h Handler) GetUserDetails() http.HandlerFunc {
+func (h Handler) GetUsersUserId() http.HandlerFunc {
 	return util.ErrorHandler(func(w http.ResponseWriter, r *http.Request) (render.Renderer, int) {
 		idString := chi.URLParam(r, "user_id")
 		if idString == "" {

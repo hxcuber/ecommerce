@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func (h Handler) RegisterUser() http.HandlerFunc {
+func (h Handler) PostUsersRegister() http.HandlerFunc {
 	return util.ErrorHandler(func(w http.ResponseWriter, r *http.Request) (render.Renderer, int) {
 		var req request.RegisterUserRequest
 		if err := render.Bind(r, &req); err != nil {

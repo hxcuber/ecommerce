@@ -6,10 +6,14 @@ docker-build:
 	docker build -f build/migrate.Dockerfile -t ${PROJECT_NAME}-migrate:latest .
 	docker image prune -f
 
-docker-run:
+docker-setup:
 	${COMPOSE} up pg -d
 	sleep 5
 	${COMPOSE} up db-migrate
+	@echo 'db set up and migrated, running in background'
+
+docker-run:
+	@echo 'db is running in background, "make docker-stop-db" to stop db'
 	${COMPOSE} up api
 
 docker-start-db:
@@ -24,3 +28,9 @@ docker-teardown:
 docker-test:
 	${COMPOSE} up test
 	${COMPOSE} down test
+
+docker-boilerplate:
+	docker start-db
+	PSQL_DBNAME=${PROJECT_NAME} PSQL_HOST=pg PSQL_USER=${PROJECT_NAME} docker compose run 'sh -c sqlboiler --wipe --add-enum-types psql'
+	docker stop-db
+

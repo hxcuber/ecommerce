@@ -26,8 +26,8 @@ func (rtr Router) Handler() http.Handler {
 	)
 
 	r.Route("/users", func(r chi.Router) {
-		r.Get("/{user_id}", rtr.userRESTHandler.GetUserDetails())
-		r.Post("/register", rtr.userRESTHandler.RegisterUser())
+		r.Get("/{user_id}", rtr.userRESTHandler.GetUsersUserId())
+		r.Post("/register", rtr.userRESTHandler.PostUsersRegister())
 	})
 
 	return r
