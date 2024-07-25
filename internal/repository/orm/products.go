@@ -28,7 +28,7 @@ type Product struct {
 	Description string    `boil:"description" json:"description" toml:"description" yaml:"description"`
 	Price       float32   `boil:"price" json:"price" toml:"price" yaml:"price"`
 	Stock       int64     `boil:"stock" json:"stock" toml:"stock" yaml:"stock"`
-	CategoryID  Category  `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
+	Category    Category  `boil:"category" json:"category" toml:"category" yaml:"category"`
 	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt   time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
@@ -42,7 +42,7 @@ var ProductColumns = struct {
 	Description string
 	Price       string
 	Stock       string
-	CategoryID  string
+	Category    string
 	CreatedAt   string
 	UpdatedAt   string
 }{
@@ -51,7 +51,7 @@ var ProductColumns = struct {
 	Description: "description",
 	Price:       "price",
 	Stock:       "stock",
-	CategoryID:  "category_id",
+	Category:    "category",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 }
@@ -62,7 +62,7 @@ var ProductTableColumns = struct {
 	Description string
 	Price       string
 	Stock       string
-	CategoryID  string
+	Category    string
 	CreatedAt   string
 	UpdatedAt   string
 }{
@@ -71,7 +71,7 @@ var ProductTableColumns = struct {
 	Description: "products.description",
 	Price:       "products.price",
 	Stock:       "products.stock",
-	CategoryID:  "products.category_id",
+	Category:    "products.category",
 	CreatedAt:   "products.created_at",
 	UpdatedAt:   "products.updated_at",
 }
@@ -148,7 +148,7 @@ var ProductWhere = struct {
 	Description whereHelperstring
 	Price       whereHelperfloat32
 	Stock       whereHelperint64
-	CategoryID  whereHelperCategory
+	Category    whereHelperCategory
 	CreatedAt   whereHelpertime_Time
 	UpdatedAt   whereHelpertime_Time
 }{
@@ -157,7 +157,7 @@ var ProductWhere = struct {
 	Description: whereHelperstring{field: "\"products\".\"description\""},
 	Price:       whereHelperfloat32{field: "\"products\".\"price\""},
 	Stock:       whereHelperint64{field: "\"products\".\"stock\""},
-	CategoryID:  whereHelperCategory{field: "\"products\".\"category_id\""},
+	Category:    whereHelperCategory{field: "\"products\".\"category\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"products\".\"created_at\""},
 	UpdatedAt:   whereHelpertime_Time{field: "\"products\".\"updated_at\""},
 }
@@ -190,8 +190,8 @@ func (r *productR) GetOrderItems() OrderItemSlice {
 type productL struct{}
 
 var (
-	productAllColumns            = []string{"product_id", "name", "description", "price", "stock", "category_id", "created_at", "updated_at"}
-	productColumnsWithoutDefault = []string{"product_id", "name", "description", "price", "stock", "category_id", "created_at", "updated_at"}
+	productAllColumns            = []string{"product_id", "name", "description", "price", "stock", "category", "created_at", "updated_at"}
+	productColumnsWithoutDefault = []string{"product_id", "name", "description", "price", "stock", "category", "created_at", "updated_at"}
 	productColumnsWithDefault    = []string{}
 	productPrimaryKeyColumns     = []string{"product_id"}
 	productGeneratedColumns      = []string{}

@@ -34,8 +34,6 @@ services:
       DB_DEBUG_LOGGING_ENABLED: 'true'
     ports:
       - '3000:3000'
-    depends_on:
-      - db-migrate
 #  test:
 #    container_name: $PROJECT_NAME-test
 #    image: $PROJECT_NAME-api:latest

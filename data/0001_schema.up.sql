@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT NOT NULL,
   price REAL NOT NULL,
   stock BIGINT NOT NULL,
-  category_id CATEGORY NOT NULL,
+  category CATEGORY NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL
 );
