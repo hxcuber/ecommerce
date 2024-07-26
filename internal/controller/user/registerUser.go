@@ -17,20 +17,20 @@ import (
 func (i impl) RegisterUser(ctx context.Context, request request.PostUsersRegisterRequest) (model.User, error) {
 	// Check unique email
 	if _, err := i.reg.User().GetUserByEmail(context.Background(), request.Email); err == nil {
-		log.Printf(logerr.LogErrMessage("CreateUser", "validating email uniqueness", ErrEmailInUse))
+		log.Printf(logerr.Message("CreateUser", "validating email uniqueness", ErrEmailInUse))
 		return model.User{}, ErrEmailInUse
 	}
 
 	// Check unique username
 	if _, err := i.reg.User().GetUserByUsername(context.Background(), request.Username); err == nil {
-		log.Printf(logerr.LogErrMessage("CreateUser", "validating username uniqueness", ErrUsernameInUse))
+		log.Printf(logerr.Message("CreateUser", "validating username uniqueness", ErrUsernameInUse))
 		return model.User{}, ErrUsernameInUse
 	}
 
 	// Hash password
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Printf(logerr.LogErrMessage("RegisterUser", "hashing password", err))
+		log.Printf(logerr.Message("RegisterUser", "hashing password", err))
 	}
 
 	// Create new UUID for user
@@ -48,14 +48,14 @@ func (i impl) RegisterUser(ctx context.Context, request request.PostUsersRegiste
 		var err error
 		returnUser, err = registry.User().CreateUser(ctx, user)
 		if err != nil {
-			log.Printf(logerr.LogErrMessage("CreateUser", "creating user", err))
+			log.Printf(logerr.Message("CreateUser", "creating user", err))
 			return err
 		}
 		return nil
 	}, nil)
 
 	if err != nil {
-		log.Printf(logerr.LogErrMessage("CreateUser", "doing in transaction", err))
+		log.Printf(logerr.Message("CreateUser", "doing in transaction", err))
 		return model.User{}, err
 	}
 

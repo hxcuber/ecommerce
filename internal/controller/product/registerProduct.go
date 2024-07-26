@@ -30,14 +30,14 @@ func (i impl) RegisterProduct(ctx context.Context, request request.PostProductsR
 		var err error
 		returnProduct, err = registry.Product().CreateProduct(ctx, product)
 		if err != nil {
-			log.Printf(logerr.LogErrMessage("RegisterProduct", "creating product", err))
+			log.Printf(logerr.Message("RegisterProduct", "creating product", err))
 			return err
 		}
 		return nil
 	}, nil)
 
 	if err != nil {
-		log.Printf(logerr.LogErrMessage("RegisterProduct", "doing in transaction", err))
+		log.Printf(logerr.Message("RegisterProduct", "doing in transaction", err))
 		return model.Product{}, err
 	}
 

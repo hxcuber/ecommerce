@@ -13,7 +13,7 @@ import (
 func (i impl) UpdateProduct(ctx context.Context, id util.UUIDString, request request.PutProductsProductIdRequest) (model.Product, error) {
 	ormProduct, err := i.reg.Product().GetProductByID(context.Background(), id)
 	if err != nil {
-		log.Printf(logerr.LogErrMessage("UpdateProduct", "finding product by id", err))
+		log.Printf(logerr.Message("UpdateProduct", "finding product by id", err))
 		return model.Product{}, err
 	}
 
@@ -31,14 +31,14 @@ func (i impl) UpdateProduct(ctx context.Context, id util.UUIDString, request req
 		var err error
 		ormProduct, err = registry.Product().UpdateProductById(ctx, product)
 		if err != nil {
-			log.Printf(logerr.LogErrMessage("UpdateProduct", "updating product %s", err, string(product.ProductID)))
+			log.Printf(logerr.Message("UpdateProduct", "updating product %s", err, string(product.ProductID)))
 			return err
 		}
 		return nil
 	}, nil)
 
 	if err != nil {
-		log.Printf(logerr.LogErrMessage("UpdateProduct", "doing in transaction", err))
+		log.Printf(logerr.Message("UpdateProduct", "doing in transaction", err))
 	}
 
 	return model.FromOrmProduct(ormProduct), nil
