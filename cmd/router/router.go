@@ -5,13 +5,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"github.com/hxcuber/ecommerce/internal/handler/product"
 	"github.com/hxcuber/ecommerce/internal/handler/user"
 	"net/http"
 )
 
 type Router struct {
-	ctx             context.Context
-	userRESTHandler user.Handler
+	ctx                context.Context
+	userRESTHandler    user.Handler
+	productRESTHandler product.Handler
 }
 
 func (rtr Router) Handler() http.Handler {
@@ -28,6 +30,12 @@ func (rtr Router) Handler() http.Handler {
 	r.Route("/users", func(r chi.Router) {
 		r.Get("/{user_id}", rtr.userRESTHandler.GetUsersUserId())
 		r.Post("/register", rtr.userRESTHandler.PostUsersRegister())
+	})
+
+	r.Route("/products", func(r chi.Router) {
+		r.Get("/{product_id}", rtr.productRESTHandler.GetProductsProductId())
+		r.Post("/", rtr.productRESTHandler.PostProducts())
+		r.Put("/{product_id}", rtr.productRESTHandler.PutProductsProductId())
 	})
 
 	return r

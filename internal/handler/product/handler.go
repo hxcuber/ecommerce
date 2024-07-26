@@ -5,11 +5,11 @@ import (
 )
 
 type Handler struct {
-	productCtrl product.Controller
+	ctrl product.Controller
 }
 
-func NewHandler(productCtrl product.Controller) Handler {
+func NewHandler(ctrl product.Controller) Handler {
 	return Handler{
-		productCtrl: productCtrl,
+		ctrl: ctrl,
 	}
 }

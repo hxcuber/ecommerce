@@ -11,6 +11,7 @@ import (
 type Repository interface {
 	GetProductByID(ctx context.Context, id util.UUIDString) (*orm.Product, error)
 	CreateProduct(ctx context.Context, product model.Product) (*orm.Product, error)
+	UpdateProductById(ctx context.Context, product model.Product) (*orm.Product, error)
 }
 
 type impl struct {

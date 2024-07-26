@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/friendsofgo/errors"
 	"github.com/hxcuber/ecommerce/cmd/router"
+	"github.com/hxcuber/ecommerce/internal/controller/product"
 	"github.com/hxcuber/ecommerce/internal/controller/user"
 	"github.com/hxcuber/ecommerce/internal/repository"
 	"github.com/hxcuber/ecommerce/pkg/db/pg"
@@ -60,5 +61,6 @@ func initRouter(
 	return router.New(
 		ctx,
 		user.NewController(registry),
+		product.NewController(registry),
 	), nil
 }

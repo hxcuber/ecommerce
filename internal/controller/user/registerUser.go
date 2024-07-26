@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func (i impl) RegisterUser(ctx context.Context, request request.RegisterUserRequest) (model.User, error) {
+func (i impl) RegisterUser(ctx context.Context, request request.PostUsersRegisterRequest) (model.User, error) {
 	// Check unique email
 	if _, err := i.reg.User().GetUserByEmail(context.Background(), request.Email); err == nil {
 		log.Printf(logerr.LogErrMessage("CreateUser", "validating email uniqueness", ErrEmailInUse))
