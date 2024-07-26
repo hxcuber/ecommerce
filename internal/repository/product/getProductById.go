@@ -2,16 +2,15 @@ package product
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"github.com/hxcuber/ecommerce/internal/repository/orm"
-	"github.com/hxcuber/ecommerce/pkg/model"
+	"github.com/hxcuber/ecommerce/pkg/util"
 )
 
-func (i impl) GetProductByID(ctx context.Context, id uuid.UUID) (model.Product, error) {
-	ormProduct, err := orm.FindProduct(ctx, i.dbConn, id.String())
+func (i impl) GetProductByID(ctx context.Context, id util.UUIDString) (*orm.Product, error) {
+	ormProduct, err := orm.FindProduct(ctx, i.dbConn, string(id))
 	if err != nil {
-		return model.Product{}, err
+		return nil, err
 	}
 
-	return model.FromOrmProduct(ormProduct)
+	return ormProduct, nil
 }

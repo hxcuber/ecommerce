@@ -2,34 +2,21 @@ package model
 
 import "github.com/hxcuber/ecommerce/internal/repository/orm"
 
-type Category string
-
-const (
-	CategoryDefault     Category = "default"
-	CategoryInteresting Category = "interesting"
-	CategoryTesting     Category = "testing"
-)
-
-func FromOrmCategory(category orm.Category) Category {
-	switch category {
-	case orm.CategoryDefault:
-		return CategoryDefault
-	case orm.CategoryInteresting:
-		return CategoryInteresting
-	case orm.CategoryTesting:
-		return CategoryTesting
-	}
-	return CategoryDefault
+type Category struct {
+	CategoryID  int64  `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
+	Description string `boil:"description" json:"description" toml:"description" yaml:"description"`
 }
 
-func (category Category) ToOrmCategory() orm.Category {
-	switch category {
-	case CategoryDefault:
-		return orm.CategoryDefault
-	case CategoryInteresting:
-		return orm.CategoryInteresting
-	case CategoryTesting:
-		return orm.CategoryTesting
+func FromOrmCategory(category *orm.Category) Category {
+	return Category{
+		CategoryID:  category.CategoryID,
+		Description: category.Description,
 	}
-	return orm.CategoryDefault
+}
+
+func (category Category) ToOrmCategory() *orm.Category {
+	return &orm.Category{
+		CategoryID:  category.CategoryID,
+		Description: category.Description,
+	}
 }

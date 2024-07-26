@@ -15,8 +15,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: https://auth.example.com/oauth/authorize
-          tokenUrl: https://auth.example.com/oauth/token
+          authorizationUrl: http://localhost:3000/oauth/authorize
+          tokenUrl: http://localhost:3000/oauth/token
           scopes:
             read: Grants read access
             write: Grants write access
