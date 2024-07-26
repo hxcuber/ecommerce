@@ -10,7 +10,7 @@ import (
 
 type Controller interface {
 	GetUserDetails(ctx context.Context, id util.UUIDString) (model.User, error)
-	RegisterUser(ctx context.Context, request request.RegisterUserRequest) (model.User, error)
+	RegisterUser(ctx context.Context, request request.PostUsersRegisterRequest) (model.User, error)
 }
 
 type impl struct {

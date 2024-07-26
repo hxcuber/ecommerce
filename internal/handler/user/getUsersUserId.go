@@ -16,7 +16,7 @@ func (h Handler) GetUsersUserId() http.HandlerFunc {
 		}
 
 		if !util.ValidUUID(id) {
-			return util.ErrorDesc{Description: "unable to parse id"}, http.StatusBadRequest
+			return util.ErrorDesc{Description: "id not valid"}, http.StatusBadRequest
 		}
 
 		user, err := h.ctrl.GetUserDetails(r.Context(), util.UUIDString(id))
@@ -24,7 +24,7 @@ func (h Handler) GetUsersUserId() http.HandlerFunc {
 			return util.ErrorDesc{Description: err.Error()}, http.StatusInternalServerError
 		}
 
-		return response.UserDetailsResponse{
+		return response.GetUsersUserIdResponse{
 			UserID:    string(user.UserID),
 			Username:  user.Username,
 			Email:     user.Email,

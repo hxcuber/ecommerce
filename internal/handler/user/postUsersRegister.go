@@ -12,7 +12,7 @@ import (
 
 func (h Handler) PostUsersRegister() http.HandlerFunc {
 	return util.ErrorHandler(func(w http.ResponseWriter, r *http.Request) (render.Renderer, int) {
-		var req request.RegisterUserRequest
+		var req request.PostUsersRegisterRequest
 		if err := render.Bind(r, &req); err != nil {
 			return util.ErrorDesc{Description: err.Error()}, http.StatusBadRequest
 		}
@@ -25,11 +25,11 @@ func (h Handler) PostUsersRegister() http.HandlerFunc {
 			return util.ErrorDesc{Description: err.Error()}, http.StatusInternalServerError
 		}
 
-		return response.UserDetailsResponse{
+		return response.PostUsersRegisterResponse{
 			UserID:    string(user.UserID),
 			Username:  user.Username,
 			Email:     user.Email,
 			CreatedAt: user.CreatedAt,
-		}, http.StatusOK
+		}, http.StatusCreated
 	})
 }

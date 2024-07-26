@@ -34,3 +34,6 @@ docker-boilerplate:
 	PSQL_DBNAME=${PROJECT_NAME} PSQL_HOST=pg PSQL_USER=${PROJECT_NAME} docker compose run 'sh -c sqlboiler --wipe --add-enum-types psql'
 	docker stop-db
 
+local-boilerplate:
+	PSQL_DBNAME=${PROJECT_NAME} PSQL_HOST=localhost PSQL_USER=hxcuber sh -c 'sqlboiler --wipe --add-enum-types psql'
+

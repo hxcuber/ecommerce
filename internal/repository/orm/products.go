@@ -28,7 +28,7 @@ type Product struct {
 	Description string    `boil:"description" json:"description" toml:"description" yaml:"description"`
 	Price       float32   `boil:"price" json:"price" toml:"price" yaml:"price"`
 	Stock       int64     `boil:"stock" json:"stock" toml:"stock" yaml:"stock"`
-	Category    Category  `boil:"category" json:"category" toml:"category" yaml:"category"`
+	CategoryID  int64     `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
 	CreatedAt   time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt   time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
@@ -42,7 +42,7 @@ var ProductColumns = struct {
 	Description string
 	Price       string
 	Stock       string
-	Category    string
+	CategoryID  string
 	CreatedAt   string
 	UpdatedAt   string
 }{
@@ -51,7 +51,7 @@ var ProductColumns = struct {
 	Description: "description",
 	Price:       "price",
 	Stock:       "stock",
-	Category:    "category",
+	CategoryID:  "category_id",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 }
@@ -62,7 +62,7 @@ var ProductTableColumns = struct {
 	Description string
 	Price       string
 	Stock       string
-	Category    string
+	CategoryID  string
 	CreatedAt   string
 	UpdatedAt   string
 }{
@@ -71,7 +71,7 @@ var ProductTableColumns = struct {
 	Description: "products.description",
 	Price:       "products.price",
 	Stock:       "products.stock",
-	Category:    "products.category",
+	CategoryID:  "products.category_id",
 	CreatedAt:   "products.created_at",
 	UpdatedAt:   "products.updated_at",
 }
@@ -107,48 +107,13 @@ func (w whereHelperfloat32) NIN(slice []float32) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
-type whereHelperCategory struct{ field string }
-
-func (w whereHelperCategory) EQ(x Category) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.EQ, x)
-}
-func (w whereHelperCategory) NEQ(x Category) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelperCategory) LT(x Category) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelperCategory) LTE(x Category) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelperCategory) GT(x Category) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelperCategory) GTE(x Category) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelperCategory) IN(slice []Category) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperCategory) NIN(slice []Category) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
 var ProductWhere = struct {
 	ProductID   whereHelperstring
 	Name        whereHelperstring
 	Description whereHelperstring
 	Price       whereHelperfloat32
 	Stock       whereHelperint64
-	Category    whereHelperCategory
+	CategoryID  whereHelperint64
 	CreatedAt   whereHelpertime_Time
 	UpdatedAt   whereHelpertime_Time
 }{
@@ -157,26 +122,36 @@ var ProductWhere = struct {
 	Description: whereHelperstring{field: "\"products\".\"description\""},
 	Price:       whereHelperfloat32{field: "\"products\".\"price\""},
 	Stock:       whereHelperint64{field: "\"products\".\"stock\""},
-	Category:    whereHelperCategory{field: "\"products\".\"category\""},
+	CategoryID:  whereHelperint64{field: "\"products\".\"category_id\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"products\".\"created_at\""},
 	UpdatedAt:   whereHelpertime_Time{field: "\"products\".\"updated_at\""},
 }
 
 // ProductRels is where relationship names are stored.
 var ProductRels = struct {
+	Category   string
 	OrderItems string
 }{
+	Category:   "Category",
 	OrderItems: "OrderItems",
 }
 
 // productR is where relationships are stored.
 type productR struct {
+	Category   *Category      `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
 	OrderItems OrderItemSlice `boil:"OrderItems" json:"OrderItems" toml:"OrderItems" yaml:"OrderItems"`
 }
 
 // NewStruct creates a new relationship struct
 func (*productR) NewStruct() *productR {
 	return &productR{}
+}
+
+func (r *productR) GetCategory() *Category {
+	if r == nil {
+		return nil
+	}
+	return r.Category
 }
 
 func (r *productR) GetOrderItems() OrderItemSlice {
@@ -190,8 +165,8 @@ func (r *productR) GetOrderItems() OrderItemSlice {
 type productL struct{}
 
 var (
-	productAllColumns            = []string{"product_id", "name", "description", "price", "stock", "category", "created_at", "updated_at"}
-	productColumnsWithoutDefault = []string{"product_id", "name", "description", "price", "stock", "category", "created_at", "updated_at"}
+	productAllColumns            = []string{"product_id", "name", "description", "price", "stock", "category_id", "created_at", "updated_at"}
+	productColumnsWithoutDefault = []string{"product_id", "name", "description", "price", "stock", "category_id", "created_at", "updated_at"}
 	productColumnsWithDefault    = []string{}
 	productPrimaryKeyColumns     = []string{"product_id"}
 	productGeneratedColumns      = []string{}
@@ -502,6 +477,17 @@ func (q productQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	return count > 0, nil
 }
 
+// Category pointed to by the foreign key.
+func (o *Product) Category(mods ...qm.QueryMod) categoryQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"category_id\" = ?", o.CategoryID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Categories(queryMods...)
+}
+
 // OrderItems retrieves all the order_item's OrderItems with an executor.
 func (o *Product) OrderItems(mods ...qm.QueryMod) orderItemQuery {
 	var queryMods []qm.QueryMod
@@ -514,6 +500,126 @@ func (o *Product) OrderItems(mods ...qm.QueryMod) orderItemQuery {
 	)
 
 	return OrderItems(queryMods...)
+}
+
+// LoadCategory allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (productL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singular bool, maybeProduct interface{}, mods queries.Applicator) error {
+	var slice []*Product
+	var object *Product
+
+	if singular {
+		var ok bool
+		object, ok = maybeProduct.(*Product)
+		if !ok {
+			object = new(Product)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeProduct)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeProduct))
+			}
+		}
+	} else {
+		s, ok := maybeProduct.(*[]*Product)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeProduct)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeProduct))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &productR{}
+		}
+		args[object.CategoryID] = struct{}{}
+
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &productR{}
+			}
+
+			args[obj.CategoryID] = struct{}{}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`categories`),
+		qm.WhereIn(`categories.category_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Category")
+	}
+
+	var resultSlice []*Category
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Category")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for categories")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for categories")
+	}
+
+	if len(categoryAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Category = foreign
+		if foreign.R == nil {
+			foreign.R = &categoryR{}
+		}
+		foreign.R.Products = append(foreign.R.Products, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.CategoryID == foreign.CategoryID {
+				local.R.Category = foreign
+				if foreign.R == nil {
+					foreign.R = &categoryR{}
+				}
+				foreign.R.Products = append(foreign.R.Products, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadOrderItems allows an eager lookup of values, cached into the
@@ -624,6 +730,53 @@ func (productL) LoadOrderItems(ctx context.Context, e boil.ContextExecutor, sing
 				break
 			}
 		}
+	}
+
+	return nil
+}
+
+// SetCategory of the product to the related item.
+// Sets o.R.Category to related.
+// Adds o to related.R.Products.
+func (o *Product) SetCategory(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Category) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"products\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"category_id"}),
+		strmangle.WhereClause("\"", "\"", 2, productPrimaryKeyColumns),
+	)
+	values := []interface{}{related.CategoryID, o.ProductID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.CategoryID = related.CategoryID
+	if o.R == nil {
+		o.R = &productR{
+			Category: related,
+		}
+	} else {
+		o.R.Category = related
+	}
+
+	if related.R == nil {
+		related.R = &categoryR{
+			Products: ProductSlice{o},
+		}
+	} else {
+		related.R.Products = append(related.R.Products, o)
 	}
 
 	return nil

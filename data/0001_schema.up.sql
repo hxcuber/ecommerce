@@ -1,5 +1,4 @@
 CREATE TYPE STATUS AS ENUM ('processed','shipped','delivered');
-CREATE TYPE CATEGORY AS ENUM ('default', 'interesting', 'testing');
 
 CREATE TABLE IF NOT EXISTS users (
   user_id UUID PRIMARY KEY,
@@ -9,15 +8,21 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS categories (
+  category_id BIGSERIAL PRIMARY KEY,
+  description TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS products (
   product_id UUID PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   price REAL NOT NULL,
   stock BIGINT NOT NULL,
-  category CATEGORY NOT NULL,
+  category_id BIGINT NOT NULL,
   created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL
+  updated_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (category_id) REFERENCES categories (category_id)
 );
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -28,7 +33,7 @@ CREATE TABLE IF NOT EXISTS orders (
   status STATUS NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL,
-  FOREIGN KEY ( user_id ) REFERENCES users ( user_id )
+  FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
@@ -39,3 +44,14 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (order_id) references orders (order_id),
   FOREIGN KEY (product_id) references products (product_id)
 );
+
+INSERT INTO categories (description) VALUES ('cat1');
+INSERT INTO categories (description) VALUES ('cat2');
+INSERT INTO categories (description) VALUES ('cat3');
+INSERT INTO categories (description) VALUES ('cat4');
+INSERT INTO categories (description) VALUES ('cat5');
+INSERT INTO categories (description) VALUES ('cat6');
+INSERT INTO categories (description) VALUES ('cat7');
+INSERT INTO categories (description) VALUES ('cat8');
+INSERT INTO categories (description) VALUES ('cat9');
+INSERT INTO categories (description) VALUES ('cat10');

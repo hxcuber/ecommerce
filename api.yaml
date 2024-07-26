@@ -15,8 +15,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: https://auth.example.com/oauth/authorize
-          tokenUrl: https://auth.example.com/oauth/token
+          authorizationUrl: http://localhost:3000/oauth/authorize
+          tokenUrl: http://localhost:3000/oauth/token
           scopes:
             read: Grants read access
             write: Grants write access
@@ -48,7 +48,7 @@ paths:
                 - email
                 - password
       responses:
-        '200':
+        '201':
           description: Successful registration
           content:
             application/json:
@@ -155,7 +155,7 @@ paths:
                 - stock
                 - category_id
       responses:
-        '200':
+        '201':
           description: Product added
           content:
             application/json:
@@ -213,6 +213,9 @@ paths:
                   category_id:
                     type: string
                   created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
                     type: string
                     format: date-time
       description: |
@@ -306,7 +309,7 @@ paths:
                 - total_amount
                 - shipping_address
       responses:
-        '200':
+        '201':
           description: Order created
           content:
             application/json:
