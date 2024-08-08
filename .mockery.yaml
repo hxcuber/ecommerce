@@ -1,0 +1,25 @@
+with-expecter: true
+inpackage: true
+dir: "{{.InterfaceDir}}"
+packages:
+  github.com/hxcuber/ecommerce/internal/repository:
+    interfaces:
+      Registry:
+  github.com/hxcuber/ecommerce/internal/repository/user:
+    interfaces:
+      Repository:
+  github.com/hxcuber/ecommerce/internal/repository/product:
+    interfaces:
+      Repository:
+  github.com/hxcuber/ecommerce/internal/repository/order:
+    interfaces:
+      Repository:
+  github.com/hxcuber/ecommerce/internal/repository/orderitem:
+    interfaces:
+      Repository:
+  github.com/hxcuber/ecommerce/internal/controller/user:
+    interfaces:
+      Controller:
+  github.com/hxcuber/ecommerce/internal/controller/product:
+    interfaces:
+      Controller:
